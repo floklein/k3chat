@@ -1,5 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { query } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { mutation, query } from "./_generated/server";
+import { userMessage } from "./schema";
 
 export const getChats = query({
   args: {},
@@ -13,5 +15,25 @@ export const getChats = query({
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
+  },
+});
+
+export const createChat = mutation({
+  args: {
+    content: userMessage.fields.content,
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+    const chatId = await ctx.db.insert("chats", {
+      name: args.content.toString(),
+      userId,
+    });
+    await ctx.runMutation(internal.messages.sendMessage, {
+      chatId,
+      content: args.content,
+    });
   },
 });
