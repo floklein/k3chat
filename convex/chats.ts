@@ -35,5 +35,6 @@ export const createChat = mutation({
       chatId,
       content: args.content,
     });
+    return chatId;
   },
 });

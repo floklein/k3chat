@@ -3,17 +3,20 @@
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function NewChatPage() {
   const createChat = useMutation(api.chats.createChat);
+  const router = useRouter();
 
   const [text, setText] = useState("");
 
-  const submit = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const submit = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      createChat({ content: text });
+      const chatId = await createChat({ content: text });
+      router.push(`/${chatId}`);
     }
   };
 

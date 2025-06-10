@@ -29,7 +29,7 @@ export const userMessage = v.object({
   content: v.union(v.string(), v.array(contentPart)),
 });
 
-const assistantMessage = v.object({
+export const assistantMessage = v.object({
   _id: v.id("messages"),
   _creationTime: v.number(),
   chatId: v.id("chats"),
