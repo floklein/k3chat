@@ -25,7 +25,7 @@ export default function NewChatPage() {
       <Textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="w-full max-w-2xl resize-none border-none"
+        className="w-full max-w-2xl resize-none bg-background shadow-sm focus-visible:shadow-lg transition-shadow"
         placeholder="Type a message to start a new chat..."
         autoFocus
         onKeyDown={submit}

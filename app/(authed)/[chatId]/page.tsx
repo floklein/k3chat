@@ -37,11 +37,11 @@ export default function ChatPage() {
             <MessageBubble key={message._id} message={message} />
           ))}
         </div>
-        <div className="bg-background px-4 pb-4 sticky bottom-0">
+        <div className="px-4 pb-4 sticky bottom-0 backdrop-blur-sm">
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="resize-none border-none"
+            className="resize-none bg-background shadow-sm focus-visible:shadow-lg transition-shadow"
             placeholder="Type a message..."
             autoFocus
             onKeyDown={submit}

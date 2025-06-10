@@ -14,7 +14,7 @@ export function MessageBubble({ message }: { message: Doc<"messages"> }) {
         className={cn(
           message.role === "assistant" && "w-full",
           message.role === "user" &&
-            "max-w-[80%] rounded-lg px-3 py-2 shadow-sm bg-accent",
+            "max-w-[80%] rounded-lg px-3 py-2 bg-accent",
         )}
       >
         <MessageContent content={message.content} />

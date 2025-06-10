@@ -17,12 +17,16 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut, Monitor, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { api } from "../convex/_generated/api";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
+  const { setTheme } = useTheme();
+
   const { signOut } = useAuthActions();
+
   const user = useQuery(api.users.getAuthUser);
 
   const userName = user?.name ?? "";
@@ -77,6 +81,19 @@ export function NavUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              <Sun />
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              <Moon />
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              <Monitor />
+              System
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut}>
               <LogOut />

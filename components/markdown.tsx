@@ -1,8 +1,14 @@
+import { useTheme } from "next-themes";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {
+  vs,
+  vscDarkPlus,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export function Markdown({ children }: { children: string }) {
+  const { resolvedTheme } = useTheme();
+
   return (
     <ReactMarkdown
       components={{
@@ -13,9 +19,11 @@ export function Markdown({ children }: { children: string }) {
             <SyntaxHighlighter
               PreTag="div"
               language={match[1]}
-              style={vscDarkPlus}
+              style={resolvedTheme === "dark" ? vscDarkPlus : vs}
               customStyle={{
-                borderRadius: "0.625rem",
+                borderRadius: "var(--radius)",
+                backgroundColor: "var(--accent)",
+                border: "none",
               }}
             >
               {String(children).replace(/\n$/, "")}
