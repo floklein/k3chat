@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 
 export default function ChatPage() {
   const { chatId } = useParams();
+
   const messages = useQuery(api.messages.getMessages, {
     chatId: chatId as Id<"chats">,
   });
