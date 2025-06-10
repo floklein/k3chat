@@ -12,20 +12,22 @@ export default function NewChatPage() {
 
   const [text, setText] = useState("");
 
-  const submit = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  async function submit(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       const chatId = await createChat({ content: text });
       router.push(`/${chatId}`);
     }
-  };
+  }
 
   return (
     <div className="flex-1 flex items-center justify-center">
       <Textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="w-full max-w-2xl resize-none"
+        className="w-full max-w-2xl resize-none border-none"
+        placeholder="Type a message to start a new chat..."
+        autoFocus
         onKeyDown={submit}
       />
     </div>
