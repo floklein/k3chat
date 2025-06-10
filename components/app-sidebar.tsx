@@ -64,8 +64,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === `/${chat._id}`}
+                    className="truncate"
                   >
-                    <Link href={`/${chat._id}`}>{chat.name}</Link>
+                    <Link href={`/${chat._id}`}>
+                      <span>{chat.name}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
