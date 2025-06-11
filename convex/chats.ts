@@ -5,17 +5,20 @@ import { mutation, query } from "./_generated/server";
 import { userMessage } from "./schema";
 
 export const getChats = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    search: v.optional(v.string()),
+  },
+  handler: async (ctx, { search }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("Unauthorized");
     }
-    return await ctx.db
+    const chats = await ctx.db
       .query("chats")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
+    return search ? chats.filter((chat) => chat.name.includes(search)) : chats;
   },
 });
 

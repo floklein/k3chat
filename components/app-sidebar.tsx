@@ -19,14 +19,16 @@ import { useQuery } from "convex/react";
 import { BotMessageSquare } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import * as React from "react";
+import { useState } from "react";
 import { NavUser } from "./nav-user";
 import { Button } from "./ui/button";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
 
-  const chats = useQuery(api.chats.getChats);
+  const [search, setSearch] = useState("");
+
+  const chats = useQuery(api.chats.getChats, { search });
 
   return (
     <Sidebar {...props}>
@@ -52,7 +54,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </Button>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SearchForm />
+        <SearchForm value={search} onChange={setSearch} />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
