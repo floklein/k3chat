@@ -1,35 +1,24 @@
 "use client";
 
-import { Textarea } from "@/components/ui/textarea";
+import { ChatTextarea } from "@/components/chat-textarea";
 import { api } from "@/convex/_generated/api";
+import { Model } from "@/lib/models";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function NewChatPage() {
-  const createChat = useMutation(api.chats.createChat);
   const router = useRouter();
 
-  const [text, setText] = useState("");
+  const createChat = useMutation(api.chats.createChat);
 
-  async function submit(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      const chatId = await createChat({ content: text });
-      router.push(`/${chatId}`);
-    }
+  async function submit(text: string, model: Model) {
+    const chatId = await createChat({ content: text, model });
+    router.push(`/${chatId}`);
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <Textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        className="w-full max-w-2xl resize-none bg-background shadow-sm focus-visible:shadow-lg transition-shadow"
-        placeholder="Type a message to start a new chat..."
-        autoFocus
-        onKeyDown={submit}
-      />
+    <div className="flex-1 flex flex-col space-y-2 items-center justify-center">
+      <ChatTextarea onSubmit={submit} className="w-full max-w-2xl" />
     </div>
   );
 }

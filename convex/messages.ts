@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import OpenAI from "openai";
+import { Model, models } from "../lib/models";
 import { internal } from "./_generated/api";
 import {
   internalAction,
@@ -22,7 +23,7 @@ export const getMessages = query({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      return [];
+      throw new Error("Unauthorized");
     }
     return await ctx.db
       .query("messages")
@@ -36,11 +37,13 @@ export const createMessage = mutation({
   args: {
     chatId: v.id("chats"),
     content: v.string(),
+    model: v.string(),
   },
   handler: async (ctx, args) => {
     await ctx.runMutation(internal.messages.sendMessage, {
       chatId: args.chatId,
       content: args.content,
+      model: args.model,
     });
   },
 });
@@ -49,6 +52,7 @@ export const sendMessage = internalMutation({
   args: {
     chatId: v.id("chats"),
     content: userMessage.fields.content,
+    model: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -67,6 +71,7 @@ export const sendMessage = internalMutation({
       .collect();
     await ctx.scheduler.runAfter(0, internal.messages.createCompletion, {
       messages,
+      model: args.model,
     });
   },
 });
@@ -74,10 +79,15 @@ export const sendMessage = internalMutation({
 export const createCompletion = internalAction({
   args: {
     messages: v.array(v.union(userMessage, assistantMessage)),
+    model: v.string(),
   },
   handler: async (ctx, args) => {
+    const model = models[args.model as Model];
+    if (!model) {
+      throw new Error("Invalid model");
+    }
     const completion = await openai.chat.completions.create({
-      model: "google/gemini-2.5-flash-preview-05-20",
+      model: model.modelId,
       messages: args.messages,
       stream: true,
     });
@@ -86,6 +96,7 @@ export const createCompletion = internalAction({
       {
         chatId: args.messages[0].chatId,
         content: "",
+        model: args.model,
       },
     );
     let content = "";
@@ -103,12 +114,14 @@ export const insertCompletion = internalMutation({
   args: {
     chatId: v.id("chats"),
     content: v.string(),
+    model: v.string(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("messages", {
       chatId: args.chatId,
       content: args.content,
       role: "assistant",
+      model: args.model,
     });
   },
 });

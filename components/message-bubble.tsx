@@ -1,5 +1,6 @@
 import { MessageContent } from "@/components/message-content";
 import { Doc } from "@/convex/_generated/dataModel";
+import { Model, models } from "@/lib/models";
 import { cn } from "@/lib/utils";
 
 export function MessageBubble({ message }: { message: Doc<"messages"> }) {
@@ -18,6 +19,11 @@ export function MessageBubble({ message }: { message: Doc<"messages"> }) {
         )}
       >
         <MessageContent content={message.content} />
+        {message.role === "assistant" && (
+          <div className="text-xs text-muted-foreground">
+            {models[message.model as Model].name}
+          </div>
+        )}
       </div>
     </div>
   );

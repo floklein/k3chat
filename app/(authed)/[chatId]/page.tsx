@@ -1,32 +1,32 @@
 "use client";
 
+import { ChatTextarea } from "@/components/chat-textarea";
 import { MessageBubble } from "@/components/message-bubble";
-import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { Model } from "@/lib/models";
 import { useMutation, useQuery } from "convex/react";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { use } from "react";
 
-export default function ChatPage() {
-  const { chatId } = useParams();
+export default function ChatPage({
+  params,
+}: {
+  params: Promise<{ chatId: string }>;
+}) {
+  const { chatId } = use(params);
+
   const createMessage = useMutation(api.messages.createMessage);
-
-  const [text, setText] = useState("");
 
   const messages = useQuery(api.messages.getMessages, {
     chatId: chatId as Id<"chats">,
   });
 
-  async function submit(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      await createMessage({
-        chatId: chatId as Id<"chats">,
-        content: text,
-      });
-      setText("");
-    }
+  async function submit(text: string, model: Model) {
+    await createMessage({
+      chatId: chatId as Id<"chats">,
+      content: text,
+      model,
+    });
   }
 
   return (
@@ -38,14 +38,7 @@ export default function ChatPage() {
           ))}
         </div>
         <div className="px-4 pb-4 sticky bottom-0 backdrop-blur-sm">
-          <Textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="resize-none bg-background shadow-sm focus-visible:shadow-lg transition-shadow"
-            placeholder="Type a message..."
-            autoFocus
-            onKeyDown={submit}
-          />
+          <ChatTextarea onSubmit={submit} />
         </div>
       </div>
     </div>

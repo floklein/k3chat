@@ -1,4 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 import { userMessage } from "./schema";
@@ -21,6 +22,7 @@ export const getChats = query({
 export const createChat = mutation({
   args: {
     content: userMessage.fields.content,
+    model: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -34,6 +36,7 @@ export const createChat = mutation({
     await ctx.runMutation(internal.messages.sendMessage, {
       chatId,
       content: args.content,
+      model: args.model,
     });
     return chatId;
   },

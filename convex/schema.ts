@@ -38,6 +38,7 @@ export const assistantMessage = v.object({
     v.string(),
     v.array(v.union(contentPartText, contentPartRefusal)),
   ),
+  model: v.string(),
 });
 
 export default defineSchema({
