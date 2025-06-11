@@ -15,14 +15,14 @@ export default function ChatPage({
 }) {
   const { chatId } = use(params);
 
-  const createMessage = useMutation(api.messages.createMessage);
+  const createUserMessage = useMutation(api.messages.createUserMessage);
 
   const messages = useQuery(api.messages.getMessages, {
     chatId: chatId as Id<"chats">,
   });
 
   async function submit(text: string, model: Model) {
-    await createMessage({
+    await createUserMessage({
       chatId: chatId as Id<"chats">,
       content: text,
       model,

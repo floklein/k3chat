@@ -9,7 +9,7 @@ export const getChats = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      return [];
+      throw new Error("Unauthorized");
     }
     return await ctx.db
       .query("chats")
@@ -33,7 +33,7 @@ export const createChat = mutation({
       name: args.content.toString(),
       userId,
     });
-    await ctx.runMutation(internal.messages.sendMessage, {
+    await ctx.runMutation(internal.messages.insertUserMessage, {
       chatId,
       content: args.content,
       model: args.model,

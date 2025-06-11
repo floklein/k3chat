@@ -25,6 +25,13 @@ export const getMessages = query({
     if (!userId) {
       throw new Error("Unauthorized");
     }
+    const chat = await ctx.db.get(args.chatId);
+    if (!chat) {
+      throw new Error("Chat not found");
+    }
+    if (chat.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
     return await ctx.db
       .query("messages")
       .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
@@ -33,14 +40,14 @@ export const getMessages = query({
   },
 });
 
-export const createMessage = mutation({
+export const createUserMessage = mutation({
   args: {
     chatId: v.id("chats"),
     content: v.string(),
     model: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.runMutation(internal.messages.sendMessage, {
+    await ctx.runMutation(internal.messages.insertUserMessage, {
       chatId: args.chatId,
       content: args.content,
       model: args.model,
@@ -48,7 +55,7 @@ export const createMessage = mutation({
   },
 });
 
-export const sendMessage = internalMutation({
+export const insertUserMessage = internalMutation({
   args: {
     chatId: v.id("chats"),
     content: userMessage.fields.content,
