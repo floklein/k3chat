@@ -18,7 +18,11 @@ export const getChats = query({
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
-    return search ? chats.filter((chat) => chat.name.includes(search)) : chats;
+    return search
+      ? chats.filter((chat) =>
+          chat.name.toLowerCase().includes(search.toLowerCase()),
+        )
+      : chats;
   },
 });
 
