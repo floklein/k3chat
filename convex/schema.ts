@@ -25,6 +25,7 @@ export const userMessage = v.object({
   _id: v.id("messages"),
   _creationTime: v.number(),
   chatId: v.id("chats"),
+  userId: v.id("users"),
   role: v.literal("user"),
   content: v.union(v.string(), v.array(contentPart)),
 });
@@ -33,6 +34,7 @@ export const assistantMessage = v.object({
   _id: v.id("messages"),
   _creationTime: v.number(),
   chatId: v.id("chats"),
+  userId: v.id("users"),
   role: v.literal("assistant"),
   content: v.union(
     v.string(),
@@ -48,6 +50,7 @@ export default defineSchema({
     _creationTime: v.number(),
     name: v.string(),
     userId: v.id("users"),
+    model: v.string(),
   }).index("by_user", ["userId"]),
   messages: defineTable(v.union(userMessage, assistantMessage)).index(
     "by_chat",

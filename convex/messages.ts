@@ -47,9 +47,17 @@ export const createUserMessage = mutation({
     model: v.string(),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
     await ctx.runMutation(internal.messages.insertUserMessage, {
       chatId: args.chatId,
+      userId,
       content: args.content,
+      model: args.model,
+    });
+    await ctx.db.patch(args.chatId, {
       model: args.model,
     });
   },
@@ -58,16 +66,14 @@ export const createUserMessage = mutation({
 export const insertUserMessage = internalMutation({
   args: {
     chatId: v.id("chats"),
+    userId: v.id("users"),
     content: userMessage.fields.content,
     model: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Unauthorized");
-    }
     await ctx.db.insert("messages", {
       chatId: args.chatId,
+      userId: args.userId,
       content: args.content,
       role: "user",
     });
@@ -77,6 +83,7 @@ export const insertUserMessage = internalMutation({
       .order("asc")
       .collect();
     await ctx.scheduler.runAfter(0, internal.messages.createCompletion, {
+      userId: args.userId,
       messages,
       model: args.model,
     });
@@ -87,6 +94,7 @@ export const createCompletion = internalAction({
   args: {
     messages: v.array(v.union(userMessage, assistantMessage)),
     model: v.string(),
+    userId: v.id("users"),
   },
   handler: async (ctx, args) => {
     const model = models[args.model as Model];
@@ -102,6 +110,7 @@ export const createCompletion = internalAction({
       internal.messages.insertCompletion,
       {
         chatId: args.messages[0].chatId,
+        userId: args.userId,
         content: "",
         model: args.model,
       },
@@ -120,12 +129,14 @@ export const createCompletion = internalAction({
 export const insertCompletion = internalMutation({
   args: {
     chatId: v.id("chats"),
+    userId: v.id("users"),
     content: v.string(),
     model: v.string(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("messages", {
       chatId: args.chatId,
+      userId: args.userId,
       content: args.content,
       role: "assistant",
       model: args.model,

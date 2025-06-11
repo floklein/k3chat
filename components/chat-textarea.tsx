@@ -10,18 +10,19 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { DEFAULT_MODEL, Model, models } from "@/lib/models";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { useLocalStorage } from "usehooks-ts";
+import { useEffect, useState } from "react";
 
 export function ChatTextarea({
   onSubmit,
   className,
+  initialModel,
 }: {
   onSubmit: (text: string, model: Model) => Promise<void>;
   className?: string;
+  initialModel?: Model;
 }) {
   const [text, setText] = useState("");
-  const [model, setModel] = useLocalStorage<Model>("model", DEFAULT_MODEL);
+  const [model, setModel] = useState<Model>(initialModel ?? DEFAULT_MODEL);
 
   async function submit(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -30,6 +31,10 @@ export function ChatTextarea({
       setText("");
     }
   }
+
+  useEffect(() => {
+    setModel(initialModel ?? DEFAULT_MODEL);
+  }, [initialModel]);
 
   return (
     <div className={cn("flex flex-col space-y-2 w-full", className)}>

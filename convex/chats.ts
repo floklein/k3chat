@@ -26,6 +26,15 @@ export const getChats = query({
   },
 });
 
+export const getChat = query({
+  args: {
+    chatId: v.id("chats"),
+  },
+  handler: async (ctx, { chatId }) => {
+    return await ctx.db.get(chatId);
+  },
+});
+
 export const createChat = mutation({
   args: {
     content: userMessage.fields.content,
@@ -39,9 +48,11 @@ export const createChat = mutation({
     const chatId = await ctx.db.insert("chats", {
       name: args.content.toString(),
       userId,
+      model: args.model,
     });
-    await ctx.runMutation(internal.messages.insertUserMessage, {
+    ctx.runMutation(internal.messages.insertUserMessage, {
       chatId,
+      userId,
       content: args.content,
       model: args.model,
     });

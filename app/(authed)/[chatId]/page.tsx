@@ -17,6 +17,10 @@ export default function ChatPage({
 
   const createUserMessage = useMutation(api.messages.createUserMessage);
 
+  const chat = useQuery(api.chats.getChat, {
+    chatId: chatId as Id<"chats">,
+  });
+
   const messages = useQuery(api.messages.getMessages, {
     chatId: chatId as Id<"chats">,
   });
@@ -38,7 +42,7 @@ export default function ChatPage({
           ))}
         </div>
         <div className="px-4 pb-4 sticky bottom-0 backdrop-blur-sm">
-          <ChatTextarea onSubmit={submit} />
+          <ChatTextarea onSubmit={submit} initialModel={chat?.model as Model} />
         </div>
       </div>
     </div>
