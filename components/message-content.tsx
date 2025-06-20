@@ -1,6 +1,27 @@
-import { Doc } from "@/convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import { Doc, Id } from "@/convex/_generated/dataModel";
+import { useQuery } from "convex/react";
 import Image from "next/image";
 import { Markdown } from "./markdown";
+
+function MessageContentImage({ storageId }: { storageId: Id<"_storage"> }) {
+  const url = useQuery(api.storage.getStorageUrl, {
+    storageId,
+  });
+
+  if (!url) return null;
+  return (
+    <div className="max-w-sm">
+      <Image
+        src={url}
+        alt="Uploaded image"
+        className="rounded-lg max-w-full h-auto"
+        width={400}
+        height={300}
+      />
+    </div>
+  );
+}
 
 export function MessageContent({
   content,
@@ -28,13 +49,7 @@ export function MessageContent({
             case "image_url":
               return (
                 <div key={index} className="max-w-sm">
-                  <Image
-                    src={part.image_url.url}
-                    alt="Uploaded image"
-                    className="rounded-lg max-w-full h-auto"
-                    width={400}
-                    height={300}
-                  />
+                  <MessageContentImage storageId={part.storageId} />
                 </div>
               );
             case "refusal":

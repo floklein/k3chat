@@ -4,6 +4,7 @@ import { ChatTextarea } from "@/components/chat-textarea";
 import { MessageBubble } from "@/components/message-bubble";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { UserContentParts } from "@/convex/schema";
 import { Model } from "@/lib/models";
 import { useMutation, useQuery } from "convex/react";
 import { use } from "react";
@@ -13,22 +14,22 @@ export default function ChatPage({
 }: {
   params: Promise<{ chatId: string }>;
 }) {
-  const { chatId } = use(params);
+  const chatId = use(params).chatId as Id<"chats">;
 
   const createUserMessage = useMutation(api.messages.createUserMessage);
 
   const chat = useQuery(api.chats.getChat, {
-    chatId: chatId as Id<"chats">,
+    chatId,
   });
 
   const messages = useQuery(api.messages.getMessages, {
-    chatId: chatId as Id<"chats">,
+    chatId,
   });
 
-  async function submit(text: string, model: Model) {
+  async function submit(content: UserContentParts, model: Model) {
     await createUserMessage({
-      chatId: chatId as Id<"chats">,
-      content: text,
+      chatId,
+      content,
       model,
     });
   }

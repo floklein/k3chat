@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import OpenAI from "openai";
+import { ChatCompletionContentPart } from "openai/resources";
 import { Model, models } from "../lib/models";
 import { internal } from "./_generated/api";
 import {
@@ -43,7 +44,7 @@ export const getMessages = query({
 export const createUserMessage = mutation({
   args: {
     chatId: v.id("chats"),
-    content: v.string(),
+    content: userMessage.fields.content,
     model: v.string(),
   },
   handler: async (ctx, args) => {
@@ -90,6 +91,47 @@ export const insertUserMessage = internalMutation({
   },
 });
 
+export const getOpenaiMessages = internalAction({
+  args: {
+    messages: v.array(v.union(userMessage, assistantMessage)),
+  },
+  handler: async (ctx, args) => {
+    return await Promise.all(
+      args.messages.map(async (message) => {
+        if (message.role === "user") {
+          if (typeof message.content === "string") {
+            return {
+              ...message,
+              content: message.content,
+            };
+          }
+          return {
+            ...message,
+            content: await Promise.all(
+              message.content.map(
+                async (part): Promise<ChatCompletionContentPart> => {
+                  if (part.type === "image_url") {
+                    return {
+                      ...part,
+                      image_url: {
+                        url: await ctx.runAction(internal.utils.getOpenaiUrl, {
+                          storageId: part.storageId,
+                        }),
+                      },
+                    };
+                  }
+                  return part;
+                },
+              ),
+            ),
+          };
+        }
+        return message;
+      }),
+    );
+  },
+});
+
 export const createCompletion = internalAction({
   args: {
     messages: v.array(v.union(userMessage, assistantMessage)),
@@ -103,7 +145,9 @@ export const createCompletion = internalAction({
     }
     const completion = await openai.chat.completions.create({
       model: model.modelId,
-      messages: args.messages,
+      messages: await ctx.runAction(internal.messages.getOpenaiMessages, {
+        messages: args.messages,
+      }),
       stream: true,
     });
     const messageId = await ctx.runMutation(

@@ -6,20 +6,24 @@ const contentPartText = v.object({
   type: v.literal("text"),
   text: v.string(),
 });
+export type ContentPartText = typeof contentPartText.type;
 
 const contentPartImage = v.object({
   type: v.literal("image_url"),
-  image_url: v.object({
-    url: v.string(),
-  }),
+  storageId: v.id("_storage"),
 });
+export type ContentPartImage = typeof contentPartImage.type;
 
 const contentPartRefusal = v.object({
   type: v.literal("refusal"),
   refusal: v.string(),
 });
+export type ContentPartRefusal = typeof contentPartRefusal.type;
 
-const contentPart = v.union(contentPartText, contentPartImage);
+export const userContentPart = v.union(contentPartText, contentPartImage);
+export const userContentParts = v.array(userContentPart);
+export type UserContentPart = typeof userContentPart.type;
+export type UserContentParts = typeof userContentParts.type;
 
 export const userMessage = v.object({
   _id: v.id("messages"),
@@ -27,8 +31,16 @@ export const userMessage = v.object({
   chatId: v.id("chats"),
   userId: v.id("users"),
   role: v.literal("user"),
-  content: v.union(v.string(), v.array(contentPart)),
+  content: v.union(v.string(), userContentParts),
 });
+
+export const assistantContentPart = v.union(
+  contentPartText,
+  contentPartRefusal,
+);
+export const assistantContentParts = v.array(assistantContentPart);
+export type AssistantContentPart = typeof assistantContentPart.type;
+export type AssistantContentParts = typeof assistantContentParts.type;
 
 export const assistantMessage = v.object({
   _id: v.id("messages"),
@@ -36,10 +48,7 @@ export const assistantMessage = v.object({
   chatId: v.id("chats"),
   userId: v.id("users"),
   role: v.literal("assistant"),
-  content: v.union(
-    v.string(),
-    v.array(v.union(contentPartText, contentPartRefusal)),
-  ),
+  content: v.union(v.string(), assistantContentParts),
   model: v.string(),
 });
 
