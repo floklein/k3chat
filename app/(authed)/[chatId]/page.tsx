@@ -1,7 +1,7 @@
 "use client";
 
 import { ChatTextarea } from "@/components/chat-textarea";
-import { MessageBubble } from "@/components/message-bubble";
+import { Message } from "@/components/message";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { UserContentParts } from "@/convex/schema";
@@ -39,10 +39,10 @@ export default function ChatPage({
       <div className="max-w-3xl w-full flex flex-col flex-1">
         <div className="flex flex-col flex-1 space-y-4 p-6">
           {messages?.map((message) => (
-            <MessageBubble key={message._id} message={message} />
+            <Message key={message._id} message={message} />
           ))}
         </div>
-        <div className="px-4 pb-4 sticky bottom-0 backdrop-blur-sm">
+        <div className="px-4 pb-4 sticky bottom-0 backdrop-blur-lg bg-background/80">
           <ChatTextarea onSubmit={submit} initialModel={chat?.model as Model} />
         </div>
       </div>

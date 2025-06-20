@@ -18,7 +18,7 @@ export default function NewChatPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col space-y-2 items-center justify-center">
+    <div className="flex-1 flex flex-col items-center justify-center">
       <ChatTextarea onSubmit={submit} className="w-full max-w-2xl" />
     </div>
   );

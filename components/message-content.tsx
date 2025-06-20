@@ -1,5 +1,6 @@
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
+import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import Image from "next/image";
 import { Markdown } from "./markdown";
@@ -11,58 +12,75 @@ function MessageContentImage({ storageId }: { storageId: Id<"_storage"> }) {
 
   if (!url) return null;
   return (
-    <div className="max-w-sm">
-      <Image
-        src={url}
-        alt="Uploaded image"
-        className="rounded-lg max-w-full h-auto"
-        width={400}
-        height={300}
-      />
+    <Image
+      src={url}
+      alt="Uploaded image"
+      className="rounded-lg max-w-sm h-auto"
+      width={400}
+      height={300}
+    />
+  );
+}
+
+function MessageContentText({
+  text,
+  role,
+  isRefusal = false,
+}: {
+  text: string;
+  role: "user" | "assistant";
+  isRefusal?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "whitespace-pre-wrap break-words",
+        role === "user" && "rounded-lg px-3 py-2 bg-accent",
+        isRefusal && "text-red-500 italic",
+      )}
+    >
+      <Markdown>{text}</Markdown>
     </div>
   );
 }
 
 export function MessageContent({
   content,
+  role,
 }: {
   content: Doc<"messages">["content"];
+  role: "user" | "assistant";
 }) {
   if (typeof content === "string") {
-    return (
-      <div className="whitespace-pre-wrap break-words">
-        <Markdown>{content}</Markdown>
-      </div>
-    );
+    return <MessageContentText text={content} role={role} />;
   }
   if (Array.isArray(content)) {
     return (
-      <div className="space-y-2">
+      <>
         {content.map((part, index) => {
           switch (part.type) {
             case "text":
               return (
-                <div key={index} className="whitespace-pre-wrap break-words">
-                  <Markdown>{part.text}</Markdown>
-                </div>
+                <MessageContentText key={index} text={part.text} role={role} />
               );
             case "image_url":
               return (
-                <div key={index} className="max-w-sm">
-                  <MessageContentImage storageId={part.storageId} />
-                </div>
+                <MessageContentImage key={index} storageId={part.storageId} />
               );
             case "refusal":
               return (
-                <div key={index} className="text-red-500 italic">
-                  {part.refusal}
-                </div>
+                <MessageContentText
+                  key={index}
+                  text={part.refusal}
+                  role={role}
+                  isRefusal={true}
+                />
               );
             default:
               return null;
           }
         })}
-      </div>
+      </>
     );
   }
   return null;
