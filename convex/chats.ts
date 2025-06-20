@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 import { userMessage } from "./schema";
+import { messagesToChatName } from "./lib";
 
 export const getChats = query({
   args: {
@@ -46,7 +47,7 @@ export const createChat = mutation({
       throw new Error("Unauthorized");
     }
     const chatId = await ctx.db.insert("chats", {
-      name: args.content.toString(),
+      name: messagesToChatName(args.content),
       userId,
       model: args.model,
     });

@@ -33,6 +33,7 @@ export const userMessage = v.object({
   role: v.literal("user"),
   content: v.union(v.string(), userContentParts),
 });
+export type UserMessage = typeof userMessage.type;
 
 export const assistantContentPart = v.union(
   contentPartText,

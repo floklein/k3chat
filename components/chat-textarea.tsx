@@ -64,7 +64,7 @@ export function ChatTextarea({
   async function attachFile(e: React.ChangeEvent<HTMLInputElement>) {
     const { files } = e.target;
     if (!files) return;
-    for (const file of files) {
+    for await (const file of files) {
       if (file.type.startsWith("image/")) {
         setAttachments((oldAttachments) => [
           ...oldAttachments,
@@ -81,7 +81,6 @@ export function ChatTextarea({
           body: file,
         });
         const { storageId } = await response.json();
-        console.log(storageId);
         setAttachments((oldAttachments) => [
           ...oldAttachments.slice(0, -1),
           {
@@ -143,6 +142,7 @@ export function ChatTextarea({
           multiple
           value=""
           onChange={attachFile}
+          accept="image/*"
           id="attachments"
         />
       </div>
