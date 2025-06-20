@@ -102,11 +102,13 @@ export function ChatTextarea({
 
   return (
     <div className={cn("flex flex-col space-y-2 w-full", className)}>
-      <div className="flex items-center gap-2">
-        {attachments.map((attachment, index) => (
-          <AttachmentPreview key={index} attachment={attachment} />
-        ))}
-      </div>
+      {attachments.length > 0 && (
+        <div className="flex items-center gap-2">
+          {attachments.map((attachment, index) => (
+            <AttachmentPreview key={index} attachment={attachment} />
+          ))}
+        </div>
+      )}
       <Textarea
         value={text}
         onChange={(e) => setText(e.target.value)}

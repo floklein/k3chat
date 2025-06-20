@@ -15,7 +15,7 @@ function MessageContentImage({ storageId }: { storageId: Id<"_storage"> }) {
     <Image
       src={url}
       alt="Uploaded image"
-      className="rounded-lg max-w-sm h-auto"
+      className="rounded-lg max-w-full h-auto"
       width={400}
       height={300}
     />
