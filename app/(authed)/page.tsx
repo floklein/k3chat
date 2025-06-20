@@ -2,6 +2,7 @@
 
 import { ChatTextarea } from "@/components/chat-textarea";
 import { api } from "@/convex/_generated/api";
+import { UserContentParts } from "@/convex/schema";
 import { Model } from "@/lib/models";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -11,8 +12,8 @@ export default function NewChatPage() {
 
   const createChat = useMutation(api.chats.createChat);
 
-  async function submit(text: string, model: Model) {
-    const chatId = await createChat({ content: text, model });
+  async function submit(content: UserContentParts, model: Model) {
+    const chatId = await createChat({ content, model });
     router.push(`/${chatId}`);
   }
 

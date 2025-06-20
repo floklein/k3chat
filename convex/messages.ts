@@ -114,9 +114,12 @@ export const getOpenaiMessages = internalAction({
                     return {
                       ...part,
                       image_url: {
-                        url: await ctx.runAction(internal.utils.getOpenaiUrl, {
-                          storageId: part.storageId,
-                        }),
+                        url: await ctx.runAction(
+                          internal.storage.storageIdToUrl,
+                          {
+                            storageId: part.storageId,
+                          },
+                        ),
                       },
                     };
                   }
