@@ -14,7 +14,7 @@ export default function AuthedLayout({
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="overflow-hidden relative">
-        <div className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm rounded-md">
+        <div className="absolute top-3.5 left-3.5 bg-background/80 backdrop-blur-sm rounded-md">
           <SidebarTrigger />
         </div>
         {children}
