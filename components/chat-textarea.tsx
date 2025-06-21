@@ -64,36 +64,40 @@ export function ChatTextarea({
   async function attachFile(e: React.ChangeEvent<HTMLInputElement>) {
     const { files } = e.target;
     if (!files) return;
-    for await (const file of files) {
-      if (file.type.startsWith("image/")) {
-        setAttachments((oldAttachments) => [
-          ...oldAttachments,
-          {
-            local: file,
-            type: "image_url",
-            storageId: null,
-          } satisfies ImageAttachment,
-        ]);
-        const postUrl = await generateUploadUrl();
-        const response = await fetch(postUrl, {
-          method: "POST",
-          headers: { "Content-Type": file.type },
-          body: file,
-        });
-        const { storageId } = await response.json();
-        setAttachments((oldAttachments) => [
-          ...oldAttachments.slice(0, -1),
-          {
-            ...oldAttachments[oldAttachments.length - 1],
-            storageId,
-          },
-        ]);
-      } else if (file.type.startsWith("audio/")) {
-        //
-      } else {
-        //
-      }
-    }
+    await Promise.all(
+      Array.from(files).map(async (file) => {
+        if (file.type.startsWith("image/")) {
+          const newIndex = attachments.length;
+          setAttachments((oldAttachments) => [
+            ...oldAttachments,
+            {
+              local: file,
+              type: "image_url",
+              storageId: null,
+            } satisfies ImageAttachment,
+          ]);
+          const postUrl = await generateUploadUrl();
+          const response = await fetch(postUrl, {
+            method: "POST",
+            headers: { "Content-Type": file.type },
+            body: file,
+          });
+          const { storageId } = await response.json();
+          setAttachments((oldAttachments) => [
+            ...oldAttachments.slice(0, newIndex),
+            {
+              ...oldAttachments[newIndex],
+              storageId,
+            },
+            ...oldAttachments.slice(newIndex + 1),
+          ]);
+        } else if (file.type.startsWith("audio/")) {
+          //
+        } else {
+          //
+        }
+      }),
+    );
   }
 
   useEffect(() => {

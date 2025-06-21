@@ -1,6 +1,6 @@
 import type { UserMessage } from "../schema";
 
-export function messagesToChatName(content: UserMessage["content"]) {
+export function messageContentToChatName(content: UserMessage["content"]) {
   if (typeof content === "string") {
     return content.slice(0, 20);
   }
