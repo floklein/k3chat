@@ -60,3 +60,32 @@ export const createChat = mutation({
     return chatId;
   },
 });
+
+export const deleteChat = mutation({
+  args: {
+    chatId: v.id("chats"),
+  },
+  handler: async (ctx, { chatId }) => {
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_chat", (q) => q.eq("chatId", chatId))
+      .collect();
+    await Promise.all(messages.map((message) => ctx.db.delete(message._id)));
+    await Promise.all(
+      messages.reduce<Promise<void>[]>((acc, message) => {
+        if (typeof message.content === "string") {
+          return acc;
+        }
+        acc.push(
+          ...message.content.map(async (part) => {
+            if (part.type === "image_url") {
+              return ctx.storage.delete(part.storageId);
+            }
+          }),
+        );
+        return acc;
+      }, []),
+    );
+    await ctx.db.delete(chatId);
+  },
+});

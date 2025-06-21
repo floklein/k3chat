@@ -10,25 +10,45 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
-import { BotMessageSquare } from "lucide-react";
+import { Id } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
+import { BotMessageSquare, EllipsisVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { NavUser } from "./nav-user";
 import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [search, setSearch] = useState("");
 
   const chats = useQuery(api.chats.getChats, { search });
+
+  const deleteChat = useMutation(api.chats.deleteChat);
+
+  function handleDeleteChat(chatId: Id<"chats">) {
+    return () => {
+      if (pathname === `/${chatId}`) {
+        router.push("/");
+      }
+      deleteChat({ chatId });
+    };
+  }
 
   return (
     <Sidebar {...props}>
@@ -72,6 +92,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <span>{chat.name}</span>
                     </Link>
                   </SidebarMenuButton>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction showOnHover>
+                        <EllipsisVertical />
+                        <span className="sr-only">More</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={handleDeleteChat(chat._id)}
+                      >
+                        <Trash2 />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
