@@ -35,12 +35,12 @@ function MessageContentText({
   return (
     <div
       className={cn(
-        "whitespace-pre-wrap break-words max-w-full",
-        role === "user" && "rounded-lg px-3 py-2 bg-accent",
+        "break-words max-w-full",
+        role === "user" && "rounded-lg px-4 py-3 bg-accent whitespace-pre-wrap",
         isRefusal && "text-red-500 italic",
       )}
     >
-      <Markdown>{text}</Markdown>
+      {role === "user" ? <>{text}</> : <Markdown>{text}</Markdown>}
     </div>
   );
 }

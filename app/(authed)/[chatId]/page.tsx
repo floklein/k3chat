@@ -37,7 +37,7 @@ export default function ChatPage({
   return (
     <div className="flex flex-col items-center h-screen overflow-y-auto">
       <div className="max-w-3xl w-full flex flex-col flex-1">
-        <div className="flex flex-col flex-1 space-y-4 p-6">
+        <div className="flex flex-col flex-1 space-y-12 p-6">
           {messages?.map((message) => (
             <Message key={message._id} message={message} />
           ))}
