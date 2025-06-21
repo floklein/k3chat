@@ -44,6 +44,8 @@ export function ChatTextarea({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (!areAttachmentsUploaded(attachments)) {
+        console.error("Attachments not uploaded");
+        console.log(attachments);
         return;
       }
       await onSubmit(
@@ -67,15 +69,18 @@ export function ChatTextarea({
     await Promise.all(
       Array.from(files).map(async (file) => {
         if (file.type.startsWith("image/")) {
-          const newIndex = attachments.length;
-          setAttachments((oldAttachments) => [
-            ...oldAttachments,
-            {
-              local: file,
-              type: "image_url",
-              storageId: null,
-            } satisfies ImageAttachment,
-          ]);
+          let newIndex = 0;
+          setAttachments((oldAttachments) => {
+            newIndex = oldAttachments.length;
+            return [
+              ...oldAttachments,
+              {
+                local: file,
+                type: "image_url",
+                storageId: null,
+              } satisfies ImageAttachment,
+            ];
+          });
           const postUrl = await generateUploadUrl();
           const response = await fetch(postUrl, {
             method: "POST",
