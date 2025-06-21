@@ -35,7 +35,7 @@ function MessageContentText({
   return (
     <div
       className={cn(
-        "whitespace-pre-wrap break-words",
+        "whitespace-pre-wrap break-words max-w-full",
         role === "user" && "rounded-lg px-3 py-2 bg-accent",
         isRefusal && "text-red-500 italic",
       )}
