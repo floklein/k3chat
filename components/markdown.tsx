@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -12,93 +13,81 @@ export function Markdown({ children }: { children: string }) {
   return (
     <ReactMarkdown
       components={{
-        h1(props) {
-          const { children, ...rest } = props;
+        h1({ children, ...rest }) {
           return (
             <h1 {...rest} className="text-3xl font-bold mt-12 mb-6">
               {children}
             </h1>
           );
         },
-        h2(props) {
-          const { children, ...rest } = props;
+        h2({ children, ...rest }) {
           return (
             <h2 {...rest} className="text-2xl font-bold mt-12 mb-6">
               {children}
             </h2>
           );
         },
-        h3(props) {
-          const { children, ...rest } = props;
+        h3({ children, ...rest }) {
           return (
             <h3 {...rest} className="text-xl font-bold mt-8 mb-3">
               {children}
             </h3>
           );
         },
-        h4(props) {
-          const { children, ...rest } = props;
+        h4({ children, ...rest }) {
           return (
             <h4 {...rest} className="text-lg font-bold mt-6 mb-2">
               {children}
             </h4>
           );
         },
-        h5(props) {
-          const { children, ...rest } = props;
+        h5({ children, ...rest }) {
           return (
             <h5 {...rest} className="text-base font-bold mt-4 mb-1">
               {children}
             </h5>
           );
         },
-        h6(props) {
-          const { children, ...rest } = props;
+        h6({ children, ...rest }) {
           return (
             <h6 {...rest} className="text-sm font-bold">
               {children}
             </h6>
           );
         },
-        p(props) {
-          const { children, ...rest } = props;
+        p({ children, ...rest }) {
           return (
             <p {...rest} className="my-5">
               {children}
             </p>
           );
         },
-        ul(props) {
-          const { children, ...rest } = props;
+        ul({ children, ...rest }) {
           return (
             <ul {...rest} className="list-disc list-inside my-5 pl-6.5">
               {children}
             </ul>
           );
         },
-        ol(props) {
-          const { children, ...rest } = props;
+        ol({ children, ...rest }) {
           return (
             <ol {...rest} className="list-decimal list-inside my-5 pl-6.5">
               {children}
             </ol>
           );
         },
-        li(props) {
-          const { children, ...rest } = props;
+        li({ children, ...rest }) {
           return (
             <li {...rest} className="my-2 pl-1.5">
               {children}
             </li>
           );
         },
-        hr(props) {
-          const { children, ...rest } = props;
+        hr({ children, ...rest }) {
           return <hr {...rest} className="my-12" />;
         },
-        code(props) {
-          const { children, className, node, ...rest } = props;
-          const match = /language-(\w+)/.exec(className || "");
+        code({ children, className, node, ...rest }) {
+          const match = /language-(\w+)/.exec(className ?? "");
           return match ? (
             <SyntaxHighlighter
               PreTag="div"
@@ -113,7 +102,13 @@ export function Markdown({ children }: { children: string }) {
               {String(children).replace(/\n$/, "")}
             </SyntaxHighlighter>
           ) : (
-            <code {...rest} className={className}>
+            <code
+              {...rest}
+              className={cn(
+                className,
+                "bg-accent px-[0.25em] py-[0.125em] rounded-sm",
+              )}
+            >
               {children}
             </code>
           );
